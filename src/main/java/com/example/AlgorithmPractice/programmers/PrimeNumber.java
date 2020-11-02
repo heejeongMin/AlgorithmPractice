@@ -1,8 +1,6 @@
 package com.example.AlgorithmPractice.programmers;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class PrimeNumber {
 
@@ -14,33 +12,39 @@ public class PrimeNumber {
 
     }
 
+    private static String[] str = null;
+    private static Set<String> numberSet = new TreeSet<>();
 
-    /*
-     * 1. 문제를 자른다.
-     * 2. 0으로 시작하는 지를 체크 ?
-     * 3. 소수인지 체크
-     * 4. 소수 이면 answer ++ 하기
-     *
-     */
-    public static int solution(String numbers) {
-        String[] str = numbers.split("");
-        Set<String> numberSet = new TreeSet<>();
+    public static String dfs(String s, int addCnt, List<Integer> idxList){
+        if(addCnt == 0) return s;
 
-        //경우의 조합을 만들고
         for(int i=0; i<str.length; i++){
-            String s = str[i];
+            if(idxList.contains(i)) continue;
+
+            s += str[i]; // 숫자를 붙인다.
+            idxList.add(i);
+
+            s = dfs(s, addCnt-1, idxList);//dfs
+            idxList.remove(Integer.valueOf(i));
             numberSet.add(s);
-                 //0, 1 빼고 한자리 넣기
 
-            for (int j = 0; j < str.length; j++) {
-                for (int k = 0; k <= j; k++) {
-                    if (i != k) {
-                        s += str[k];
-                    }
-                }
+            s = s.substring(0, s.length()-1);
+        }
 
-                numberSet.add(s);
-                s = str[i];
+        return s;
+    }
+
+
+    public static int solution(String numbers) {
+        str = numbers.split("");// 0, 1, 1 --> 1 11 011 101 110
+
+        for(int i=0; i<str.length; i++){
+            List<Integer> idxList = new ArrayList<>();
+            String s = str[i];
+            idxList.add(i);
+            for(int j=0; j<str.length; j++){
+               s = dfs(s, j, idxList);
+               numberSet.add(s);
             }
         }
 
@@ -61,7 +65,7 @@ public class PrimeNumber {
             res++;
         }
 
-        return answer.size();
+        return res;
     }
 
 
