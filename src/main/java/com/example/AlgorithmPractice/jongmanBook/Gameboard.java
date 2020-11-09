@@ -45,10 +45,12 @@ public class Gameboard {
             if(whiteSpaceCnt%3 != 0){
                 System.out.println(noOfWaysToCover);
             } else {
-                for(int h=0; i<height; i++){
 
+                for(int x=0; x<height; x++){
+                    for(int y=0; y<width; y++){
+                       int answer = coverChk(x, y);
+                    }
                 }
-                 coverChk();
                 System.out.println(answer);
             }
             answer = 0;
@@ -57,8 +59,17 @@ public class Gameboard {
 
     }
 
+    private static int[][][] coverType = new int[][][]{ {
+                                                            {0,0},{1,0},{0,1}
+                                                        },
+                                                        {{0,0},{0,1},{1,1}},
+                                                        {{0,0},{1,0},{1,1}},
+                                                        {{0,0},{1,0},{1,-1}}
+                                                };
 
-    public static void coverChk(){
+    public static int coverChk(int x, int y){
+        int answer = 0;
+        /*기저베이스 : 다 덮였는지 확인*/
         int cntFalse = 0;
         for(boolean[] row : board){
             for(boolean b : row){
@@ -70,46 +81,58 @@ public class Gameboard {
         }
 
         if(cntFalse == 0) {
-            answer++;
-            return;
+            return 1;
         }
 
-        for(int i=0; i<height; i++){
-            for(int j=0; j<width; j++){
-                if(!board[i][j]){ //하얀 칸이면 (false 이면)
-                    int[] pos = checkRange(i,j);
-                    coverChk();
+        /* 반복의 조각 */
+        for(int i=0; i<4; i++) {
+            boolean canBePlaced = true;
 
-                    if(pos.length != 0) {
-                        board[i][j] = false;
-                        board[i + coverType[pos[0]][pos[1]-1][0]][j + coverType[pos[0]][pos[1]-1][1]] = false;
-                        board[i + coverType[pos[0]][pos[1]][0]][j + coverType[pos[0]][pos[1]][1]] = false;
-                        return;
+            /* 블럭 모양 대로 놓을 수 있는지 먼저 보고*/
+            for(int j=1; j<3; j++){
+                /* 놓으려는 곳이 판 안인지 + 아직 안 놓였는지 확인 */
+                int newX = coverType[i][j][0];
+                int newY = coverType[i][j][1];
+
+                if((x+newX) >= height || (x+newX) < 0 || (y+newY) >= width || (y+newY) < 0) {
+                    continue;
+                } else {
+                    if(board[x+newX][y+newY]) { //비었는지 보고
+                        canBePlaced = false;
+                        break;
                     }
-
                 }
             }
-        }
-    }
 
-    private static int[][][] coverType = new int[][][]{ {{0,0},{1,0},{0,1}},
-                                                        {{0,0},{0,1},{1,1}},
-                                                        {{0,0},{1,0},{1,1}},
-                                                        {{0,0},{1,0},{1,-1}}
-                                                        };
-
-    public static boolean checkShapeIfCanCover(int x, int y, int shape) {
-        for( int i = 0; i < 3; i++){
-            int newX = x + coverType[shape][i][0];
-            int newY = y + coverType[shape][i][1];
-            if((newX < 0 || newX > height-1) || (newY < 0 || newY > width-1)){
-                if(!board[newX][newY]){
-                    return true;
-                }
+            /* 놓을 수 있으면 true로 변경 하고 그 다음 놓을 수 있는지 보기 */
+            if(canBePlaced) {
+                board[x][y] = true;
+                board[x+(coverType[i][1][0])][y+(coverType[i][1][1])] = true;
+                board[x+(coverType[i][2][0])][y+(coverType[i][2][1])] = true;
+                answer += coverChk(x, y+1);
+                board[i][0] = board[i][1] = board[i][2] = false;
+            } else {
+                break;
             }
         }
-        return false;
+
+        return 0;
     }
+
+
+
+//    public static boolean checkShapeIfCanCover(int x, int y, int shape) {
+//        for( int i = 0; i < 3; i++){
+//            int newX = x + coverType[shape][i][0];
+//            int newY = y + coverType[shape][i][1];
+//            if((newX < 0 || newX > height-1) || (newY < 0 || newY > width-1)){
+//                if(!board[newX][newY]){
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
 
     public static int[] checkRange(int x, int y){
