@@ -7,14 +7,11 @@ import java.nio.charset.StandardCharsets;
 
 public class Gameboard {
 
-    private static int noOfWaysToCover = 0;
-    private static boolean[][] board ;
-    private static int height;
-    private static int width;
     static int answer = 0;
 
     public static void main(String args[]) throws Exception {
-        String file = "C:\\Users\\민희정\\Downloads\\gameboard.txt";
+        //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String file = "C:\\Users\\hjmin\\Downloads\\gameboard.txt";
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 
         /* 문제 읽기 */
@@ -22,9 +19,9 @@ public class Gameboard {
 
         for(int i=0; i<noOfGames; i++){
             String[] arr = br.readLine().split(" ");
-            height = Integer.parseInt(arr[0]); //가로
-            width = Integer.parseInt(arr[1]); //세로
-            board = new boolean[height][width];
+            int height = Integer.parseInt(arr[0]); //가로
+            int width = Integer.parseInt(arr[1]); //세로
+            boolean[][] board  = new boolean[height][width];
 
             int whiteSpaceCnt = 0;
 
@@ -42,9 +39,9 @@ public class Gameboard {
 
             /* 로직 시작 */
             if(whiteSpaceCnt%3 != 0){
-                System.out.println(noOfWaysToCover);
+                System.out.println(0);
             } else {
-                coverChk();
+                coverChk(height, width, board);
                 System.out.println(answer);
             }
             answer = 0;
@@ -57,7 +54,7 @@ public class Gameboard {
                                                         {{0,0},{1,0},{1,-1}}
                                                 };
 
-    public static void coverChk(){
+    public static void coverChk(int height, int width, boolean[][] board){
         boolean isAllCovered = true; /*기저베이스 : 다 덮였는지 확인*/
         int x = 0;
         int y = 0;
@@ -103,7 +100,7 @@ public class Gameboard {
                 board[x][y] = true;
                 board[x+(coverType[i][1][0])][y+(coverType[i][1][1])] = true;
                 board[x+(coverType[i][2][0])][y+(coverType[i][2][1])] = true;
-                coverChk();
+                coverChk(height, width, board);
                 board[x][y] = false;
                 board[x+(coverType[i][1][0])][y+(coverType[i][1][1])] = false;
                 board[x+(coverType[i][2][0])][y+(coverType[i][2][1])] = false;
