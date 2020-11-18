@@ -11,6 +11,7 @@ public class SevenGirls {
     public static void main(String[] args) throws Exception {
         String file = "C:\\Users\\hjmin\\Downloads\\sevenGirls.txt";
         //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 
         boolean[][] girls = new boolean[5][5];
@@ -48,14 +49,37 @@ public class SevenGirls {
         System.out.println(answer);
 
     }
-//SY
+
     /* S의 위치를 중심으로 경우의 수 찾기 - 현재위치를 기준으로 대각선을 바로 볼 순 없으나 상하좌우만 탐색 */
     public static int[][] check = new int[][] {{0, -1},{-1, 0},{0, 1},{1, 0}}; //좌,상,우,하 순으로
+    public static List<Deque<String>> pastList = new ArrayList<>();
+
+    public static boolean checkDuplicate(Deque<String> posList) {
+        boolean isDuplicate = false;
+
+        Loop :
+        for(Deque<String> deque : pastList){
+            int cnt = 0;
+            for (String pos : posList) {
+                if(deque.contains(pos)) ++cnt;
+            }
+            if(cnt == 7) {
+                isDuplicate = true;
+                break Loop;
+            }
+        }
+
+        return isDuplicate;
+    }
 
     public static void addGirl(int x, int y, Deque<Boolean> group, Deque<String> posList, boolean[][] girls){
+
         //기저베이스
         if(group.size() == 7) {
-            answer++;
+            if(!checkDuplicate(posList)) {
+                answer++;
+                pastList.add(new ArrayDeque<>(posList));
+            }
             return;
         }
 
@@ -85,7 +109,7 @@ public class SevenGirls {
 
             if(isPossible){
                 group.add(girls[newX][newY]); //group에 추가를 일단하고,
-                posList.add(String.valueOf(newX) + "," + newY); //넣은 사람의 position을 저장하고 재귀
+                posList.add(newX + "," + newY); //넣은 사람의 position을 저장하고 재귀
                 addGirl(newX, newY, group, posList, girls);
                 group.pollLast();
                 posList.pollLast();
